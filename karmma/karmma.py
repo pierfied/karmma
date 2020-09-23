@@ -8,8 +8,8 @@ class KarmmaSampler:
     def tensorize(self, x):
         return torch.Tensor(x).to(dtype=torch.float32, device=self.device)
 
-    def __init__(self, g1_obs, g2_obs, mask, u, s, mu, shift, k2g1, k2g2, noise_cov_1,
-                 noise_cov_2, device='cuda'):
+    def __init__(self, g1_obs, g2_obs, mask, u, s, mu, shift, k2g1, k2g2, inv_noise_1,
+                 inv_noise_2, device='cuda'):
         self.device = device
 
         self.mask = mask
@@ -22,8 +22,8 @@ class KarmmaSampler:
         self.shift = shift
         self.k2g1 = self.tensorize(k2g1)
         self.k2g2 = self.tensorize(k2g2)
-        self.inv_noise_1 = self.tensorize(np.linalg.inv(noise_cov_1))
-        self.inv_noise_2 = self.tensorize(np.linalg.inv(noise_cov_2))
+        self.inv_noise_1 = self.tensorize(inv_noise_1)
+        self.inv_noise_2 = self.tensorize(inv_noise_2)
 
     def prior(self, x):
         return -0.5 * torch.sum(torch.square(x) / self.s)
