@@ -1,0 +1,4 @@
+numpy
+pytorch
+healpy
+tqdm
