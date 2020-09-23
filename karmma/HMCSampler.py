@@ -52,7 +52,7 @@ class HMCSampler:
             H_prime = (0.5 * torch.sum(torch.square(p) / self.m) - lnP).detach().cpu().numpy()
 
             # Perform Metropolis-Hastings accept/reject.
-            accept_ratio = np.exp(H_init - H_prime)
+            accept_ratio = np.exp(np.minimum(H_init - H_prime, 0))
             accept_prob = min(accept_ratio, 1)
             if np.random.uniform() < accept_prob:
                 sample = {'x': self.transform(x).detach().cpu().numpy(), 'lnP': lnP.detach().cpu().numpy(),
