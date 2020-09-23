@@ -48,7 +48,7 @@ class KarmmaSampler:
         return k
 
     def sample(self, num_burn, num_burn_steps, burn_epsilon, num_samples, num_samp_steps, samp_epsilon):
-        x0 = torch.randn(len(self.s)) * torch.sqrt(self.s)
+        x0 = torch.randn(len(self.s), device=self.device) * torch.sqrt(self.s)
 
         hmc = HMCSampler(self.posterior, x0, 1 / self.s, transform=self.transform, device=self.device)
 
