@@ -37,7 +37,7 @@ def cl2xi_theta(cl, theta):
     return xi
 
 
-def cl2cov_mat(cl, nside, indices=None, lmax=None, ninterp=10000, log=False, shift=None):
+def cl2cov_mat(cl, nside, mask=None, lmax=None, ninterp=10000, log=False, shift=None):
     """Covariance matrix from power spectrum.
 
     Computes the covariance matrix for the requested pixels from the provided power spectrum.
@@ -46,8 +46,8 @@ def cl2cov_mat(cl, nside, indices=None, lmax=None, ninterp=10000, log=False, shi
     :type cl: array-like (float)
     :param nside: Healpix nside parameter.
     :type nside: int
-    :param indices: Array of Healpix pixel numbers to compute covariance matrix for. Default: All pixels in the sky.
-    :type indices: array-like (int)
+    :param mask: Healpix mask to compute the covariance matrix over. Default: All pixels in the sky.
+    :type mask: array-like (bool)
     :param lmax: Maximum l mode to include in power spectrum. Default: len(cl) - 1
     :type lmax: float
     :param ninterp: Number of interpolation points for correlation function between 0 and pi. Default: 10,000
@@ -60,9 +60,10 @@ def cl2cov_mat(cl, nside, indices=None, lmax=None, ninterp=10000, log=False, shi
     :rtype: array-like (float)
     """
 
-    # If indices is not set default to all pixels.
-    if indices is None:
-        indices = np.arange(hp.nside2npix(nside))
+    # If mask is not set default to all pixels.
+    indices = np.arange(hp.nside2npix(nside))
+    if mask is not None:
+        indices = indices[mask]
 
     # Convert all array-like input to ndarrays.
     cl = np.asarray(cl)

@@ -101,15 +101,15 @@ def conv2shear(k, lmax=None):
     return g1, g2
 
 
-def conv2shear_mats(nside, indices=None, lmax=None):
+def conv2shear_mats(nside, mask=None, lmax=None):
     """Create matrices to perform convergence to shear transformations.
 
     Builds the matrices by individually computing each convergence pixel's contribution to all shear pixels.
 
     :param nside: Healpix nside parameter.
     :type nside: int
-    :param indices: Healpix pixel numbers to build matrices for. Default: All pixels in the sky.
-    :type indices: array-like (int)
+    :param mask: Healpix pixel mask to build matrices for. Default: All pixels in the sky.
+    :type indices: array-like (bool)
     :param lmax: Maximum l mode to include in transformation. Default: 3*nside - 1
     :type lmax: int
     :return: Transformation matrices for convergence to shear map components.
@@ -119,9 +119,10 @@ def conv2shear_mats(nside, indices=None, lmax=None):
     # Get the number of pixels for the full-sky map.
     npix = hp.nside2npix(nside)
 
-    # If indices is not set assume full-sky.
-    if indices is None:
-        indices = np.arange(npix)
+    # If mask is not set assume full-sky.
+    indices = np.arange(hp.nside2npix(nside))
+    if mask is not None:
+        indices = indices[mask]
 
     # Convert all array-like input to ndarrays.
     indices = np.asarray(indices)
