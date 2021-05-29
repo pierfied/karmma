@@ -1,6 +1,7 @@
 import numpy as np
 import healpy as hp
 from tqdm.auto import tqdm
+from scipy.special import eval_legendre
 
 
 def cl2xi_theta(cl, theta):
@@ -113,3 +114,26 @@ def cl2cov_mat(cl, nside, indices=None, lmax=None, ninterp=10000, log=False, shi
         cov = np.log(cov / (shift ** 2) + 1)
 
     return cov
+
+
+def lognorm_to_gauss_cl(lognorm_cl, shift, lmax=None):
+    # Discard l > lmax if lmax is provided.
+    if lmax is None:
+        lmax = len(lognorm_cl) - 1
+    else:
+        lognorm_cl = lognorm_cl[:lmax + 1]
+
+    # Get the Gauss-Legendre quadrature sample points and weights.
+    mu, w = np.polynomial.legendre.leggauss(2 * lmax)
+
+    # Compute the integrand.
+    ell = np.arange(lmax + 1)
+    integrand = np.log(np.polynomial.legendre.legval(mu, (2 * ell + 1) * lognorm_cl / (4 * np.pi * (shift ** 2))) + 1)
+
+    # Compute the integral.
+    gauss_cl = 2 * np.pi * np.sum(integrand[None, :] * eval_legendre(ell[:, None], mu[None, :]) * w[None, :], axis=-1)
+
+    # Clip negative values.
+    gauss_cl = np.maximum(0, gauss_cl)
+
+    return gauss_cl
