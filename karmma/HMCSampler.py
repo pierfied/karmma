@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 class HMCSampler:
     def __init__(self, lnP, x0, m, transform=None, device='cuda'):
@@ -26,6 +26,7 @@ class HMCSampler:
 
             # Calculate the initial Hamiltonian and gradients.
             lnP = self.lnP(x)
+            prevLnP = lnP.detach().clone()
             H_init = (0.5 * torch.sum(torch.square(p) / self.m) - lnP).detach().cpu().numpy()
             grad = torch.autograd.grad(lnP, x)[0]
 
@@ -59,7 +60,7 @@ class HMCSampler:
                           'accpet_ratio': accept_ratio, 'accept_prob': accept_prob, 'accepted': True}
                 self.x = x
             else:
-                sample = {'x': self.transform(self.x).detach().cpu().numpy(), 'lnP': lnP.detach().cpu().numpy(),
+                sample = {'x': self.transform(self.x).detach().cpu().numpy(), 'lnP': prevLnP.cpu().numpy(),
                           'accpet_ratio': accept_ratio, 'accept_prob': accept_prob, 'accepted': False}
             chain.append(sample)
 

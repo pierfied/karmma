@@ -1,4 +1,5 @@
 numpy
-pytorch
+torch
 healpy
 tqdm
+scipy
